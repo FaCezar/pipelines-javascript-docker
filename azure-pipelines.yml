@@ -1,0 +1,26 @@
+trigger:
+ - main
+
+ pool:
+   vmImage: 'ubuntu-latest' 
+
+ variables:
+   imageName: 'pipelines-javascript-docker'
+
+ steps:
+ - task: Docker@2
+   displayName: Build an image
+   inputs:
+     repository: $(imageName)
+     command: build
+     Dockerfile: app/Dockerfile
+ - task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.8'
+  displayName: 'Install Python 3.8'
+- script: pip install checkov
+  displayName: 'Install Checkov'
+- script: checkov -d <directory> --bc-api-key a2104604-bde5-4fa9-8aef-ecbc1a079bb7::6HmmWe0115Mt8tJMB1/oRr4gxQg= --repo-id <org/repo> --branch <branch>
+  displayName: 'Scan with Prisma Cloud'
+  env:
+    PRISMA_API_URL: https://api4.prismacloud.io    
